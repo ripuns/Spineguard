@@ -1,68 +1,73 @@
-import serial
-import time
+import argparse
 import csv
 import os
+import time
 from datetime import datetime
 
-# === CONFIGURATION ===
-PORT = "COM7"       # Update to your Arduino COM port
-BAUD = 115200
-MAX_SAMPLES = 100   # Number of samples per posture
+import serial
 
-# === ASK FOR LABEL ===
-LABEL = input("Label this session as 'good' or 'bad' posture: ").strip().lower()
-if LABEL not in ["good", "bad"]:
-    print("❌ Invalid label. Must be 'good' or 'bad'. Exiting.")
-    exit()
+"""
+Collect labeled samples from Arduino/MPU6050 and save to CSV.
 
-# === SET OUTPUT FILE ===
-OUTPUT_FILE = f"{LABEL}_samples.csv"
-write_header = not os.path.exists(OUTPUT_FILE)
+Expected serial line: either "ax,ay,az,gx,gy,gz" OR "ts,ax,ay,az,gx,gy,gz"
+We robustly parse both and take the last 6 numeric values as ax..gz.
+"""
 
-# === CONNECT TO ARDUINO ===
-try:
-    ser = serial.Serial(PORT, BAUD, timeout=1)
-    print(f"✅ Connected to {PORT}")
-except Exception as e:
-    print(f"❌ Could not open serial port {PORT}. Error: {e}")
-    exit()
+def parse_line_to_features(line: str):
+    """Return [ax, ay, az, gx, gy, gz] or None."""
+    parts = [p.strip() for p in line.split(",")]
+    nums = []
+    for p in parts:
+        try:
+            nums.append(float(p))
+        except ValueError:
+            # ignore non-numeric cells (headers, timestamps)
+            pass
+    if len(nums) >= 6:
+        return nums[-6:]  # last six nums = ax..gz
+    return None
 
-# === OPEN CSV FILE ===
-csv_file = open(OUTPUT_FILE, mode='a', newline='')
-csv_writer = csv.writer(csv_file)
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--port", default="COM7", help="Serial port (e.g., COM7 or /dev/ttyUSB0)")
+    ap.add_argument("--baud", type=int, default=115200, help="Baud rate")
+    ap.add_argument("--label", choices=["GOOD", "BAD", "good", "bad"], required=True, help="Posture label")
+    ap.add_argument("--samples", type=int, default=200, help="number of samples to collect")
+    args = ap.parse_args()
 
-if write_header:
-    csv_writer.writerow(["Timestamp", "AccelX", "AccelY", "AccelZ", "GyroX", "GyroY", "GyroZ", "Label"])
+    label = args.label.upper()
+    fname = f"{label.lower()}_samples_.csv"
+    path = os.path.join(os.getcwd(), fname)
 
-sample_count = 0
-print(f"🟢 Collecting {MAX_SAMPLES} samples for '{LABEL}' posture...")
-
-# === READ & SAVE DATA ===
-while sample_count < MAX_SAMPLES:
+    print(f"🔌 Opening {args.port} @ {args.baud} …")
     try:
-        line = ser.readline().decode('utf-8').strip()
-        if "ax" in line.lower():  # Skip header from Arduino
-            continue
-        if line:
-            parts = line.split(',')
-            if len(parts) == 7:
-                ts, ax, ay, az, gx, gy, gz = parts
-                ax, ay, az = float(ax), float(ay), float(az)
-                gx, gy, gz = float(gx), float(gy), float(gz)
+        ser = serial.Serial(args.port, args.baud, timeout=1)
+        time.sleep(2)  # allow port to settle
+    except serial.SerialException as e:
+        print(f"❌ Serial error: {e}")
+        return
 
-                print(f"[{sample_count+1}] AccelX: {ax:.2f}, AccelY: {ay:.2f}, AccelZ: {az:.2f}")
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["ax", "ay", "az", "gx", "gy", "gz", "label"])
+        count = 0
+        print(f"▶️  Collecting {args.samples} samples labeled {label} … Sit/pose accordingly.")
+        while count < args.samples:
+            try:
+                line = ser.readline().decode("utf-8", errors="ignore").strip()
+                if not line or "ax" in line.lower():
+                    continue
+                feats = parse_line_to_features(line)
+                if feats:
+                    w.writerow([*feats, label])
+                    count += 1
+                    if count % 10 == 0:
+                        print(f"  [{count}/{args.samples}]  ax={feats[0]:.3f} ay={feats[1]:.3f} az={feats[2]:.3f}")
+            except Exception as e:
+                print("⚠️  Parse error:", e)
 
-                # Write to CSV
-                csv_writer.writerow([ts, ax, ay, az, gx, gy, gz, LABEL])
-                csv_file.flush()
-                sample_count += 1
+    ser.close()
+    print(f"✅ Saved {args.samples} samples to {path}")
 
-        time.sleep(0.2)  # Slight delay to not overload serial buffer
-
-    except Exception as e:
-        print("❌ Error:", e)
-
-# === CLEANUP ===
-ser.close()
-csv_file.close()
-print(f"\n✅ Labeled data collection complete. {sample_count} samples saved to {OUTPUT_FILE}")
+if __name__ == "__main__":
+    main()
