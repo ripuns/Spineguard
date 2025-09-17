@@ -5,6 +5,8 @@ from collections import deque
 from colorama import Fore, Style
 import time
 import math
+import pyttsx3
+import pandas as pd
 
 # === CONFIG ===
 PORT = 'COM7'  # Change to your port
@@ -38,6 +40,7 @@ prev_tilt = None
 
 print(Fore.YELLOW + "\n📊 Starting live prediction... Sit straight and observe...\n" + Style.RESET_ALL)
 iter_count = 0
+
 
 # === LOOP ===
 while True:
@@ -81,7 +84,10 @@ while True:
         if len(feat_buffer) < feat_buffer.maxlen:
             continue
 
-        smoothed = np.mean(feat_buffer, axis=0).reshape(1, -1)
+        smoothed_array = np.mean(feat_buffer, axis=0).reshape(1, -1)
+        smoothed = pd.DataFrame(smoothed_array, columns=[
+            "ax", "ay", "az", "gx", "gy", "gz", "accel_mag", "gyro_mag", "tilt_angle"
+        ])
         pred = clf.predict(smoothed)[0]
 
         vote_buffer.append(pred)
@@ -89,11 +95,13 @@ while True:
 
         # === OUTPUT ===
         color = Fore.GREEN if final.upper() == "GOOD" else Fore.RED
-        print(color + f"📌 Posture: {final.upper()} | 🧪 Features: {np.round(smoothed[0], 3).tolist()}" + Style.RESET_ALL)
+        print(color + f"📌 Posture: {final.upper()} | 🧪 Features: {np.round(smoothed.iloc[0], 3).tolist()}" + Style.RESET_ALL)
 
 
     except KeyboardInterrupt:
         print(Fore.CYAN + "\n👋 Exiting." + Style.RESET_ALL)
         break
     except Exception as e:
-        print(Fore.YELLOW + f"⚠️ Parse/Prediction error: {e}" + Style.RESET_ALL)
+        import traceback
+        print(Fore.YELLOW + f"⚠️ Parse/Prediction error: {type(e).__name__} - {e}" + Style.RESET_ALL)
+        traceback.print_exc()
