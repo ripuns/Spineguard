@@ -1,0 +1,8 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+pyserial==3.5
+scikit-learn
+pandas
+numpy
+joblib
+Werkzeug==2.3.7
