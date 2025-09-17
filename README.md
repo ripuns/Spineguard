@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SpineGuard - Posture Monitoring Application UI
 
 A modern, desktop-based posture monitoring application UI built with React and Tailwind CSS. Designed with a dark theme inspired by modern health tech applications, featuring real-time posture monitoring, voice alerts, and model management.
@@ -170,3 +171,6 @@ For support or questions, please open an issue in the repository or contact the 
 ---
 
 **SpineGuard** - Protecting your spinal health with modern technology. 🦴✨
+=======
+# Spineguard
+>>>>>>> 0bfc03798e408d134067f3040c421c7fa6d13ed9
