@@ -61,29 +61,19 @@ const Dashboard = () => {
       try {
         const status = await ApiService.getMonitoringStatus()
         setIsMonitoring(status.active)
+        if (status.current_posture) {
+          setPostureStatus(status.current_posture)
+        }
       } catch (err) {
         console.error('Failed to check monitoring status:', err)
       }
     }
     
     checkMonitoringStatus()
-    const interval = setInterval(checkMonitoringStatus, 5000)
+    const interval = setInterval(checkMonitoringStatus, 1000) // Check every second for real-time updates
     return () => clearInterval(interval)
   }, [])
 
-  // Simulate real-time posture monitoring (replace with actual data from backend)
-  useEffect(() => {
-    if (isMonitoring) {
-      const interval = setInterval(() => {
-        // Simulate posture changes - replace with real data from serial port
-        const random = Math.random()
-        setPostureStatus(random > 0.7 ? 'bad' : 'good')
-        setPostureAccuracy(prev => Math.max(60, Math.min(100, prev + (random > 0.5 ? 2 : -1))))
-      }, 2000)
-
-      return () => clearInterval(interval)
-    }
-  }, [isMonitoring])
 
   // Update time
   useEffect(() => {

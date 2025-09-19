@@ -43,7 +43,8 @@ export const UserProvider = ({ children }) => {
       const userData = {
         id: response.user_id,
         username: response.username,
-        name: response.username
+        name: response.username,
+        token: response.token
       }
       
       setUser(userData)
@@ -70,10 +71,16 @@ export const UserProvider = ({ children }) => {
       }
       
       // Auto-login after registration
-      return await login({
-        username: userData.username,
-        password: userData.password
-      })
+      const loginUserData = {
+        id: response.user_id,
+        username: response.username,
+        name: response.username,
+        token: response.token
+      }
+      
+      setUser(loginUserData)
+      localStorage.setItem('spineguard_user', JSON.stringify(loginUserData))
+      return true
     } catch (err) {
       setError('Registration failed. Please try again.')
       return false
