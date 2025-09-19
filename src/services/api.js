@@ -1,138 +1,82 @@
+// Placeholder API service - will be implemented with new backend
 const API_BASE_URL = 'http://localhost:5000/api';
 
 class ApiService {
-  // User management
+  // Placeholder methods - to be implemented
   async register(userData) {
-    const response = await fetch(`${API_BASE_URL}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    return response.json();
+    console.log('Register API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async login(credentials) {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-    return response.json();
+    console.log('Login API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async getUserProfile(userId) {
-    const response = await fetch(`${API_BASE_URL}/user/${userId}/profile`);
-    return response.json();
+    console.log('Get user profile API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
-  // Posture monitoring
   async startMonitoring(userId) {
-    const response = await fetch(`${API_BASE_URL}/monitor/start`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId }),
-    });
-    return response.json();
+    console.log('Start monitoring API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async stopMonitoring() {
-    const response = await fetch(`${API_BASE_URL}/monitor/stop`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.json();
+    console.log('Stop monitoring API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async getMonitoringStatus() {
-    const response = await fetch(`${API_BASE_URL}/monitor/status`);
-    return response.json();
+    console.log('Get monitoring status API call - not implemented yet');
+    return { active: false, user_id: null };
   }
 
-  // Calibration
   async calibrateGoodPosture(userId, samples = 200) {
-    const response = await fetch(`${API_BASE_URL}/calibrate/good`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId, samples }),
-    });
-    return response.json();
+    console.log('Calibrate good posture API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async calibrateBadPosture(userId, samples = 200) {
-    const response = await fetch(`${API_BASE_URL}/calibrate/bad`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId, samples }),
-    });
-    return response.json();
+    console.log('Calibrate bad posture API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
-  // Model management
   async trainModel(userId) {
-    const response = await fetch(`${API_BASE_URL}/models/train`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId }),
-    });
-    return response.json();
+    console.log('Train model API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async getUserModels(userId) {
-    const response = await fetch(`${API_BASE_URL}/models/${userId}`);
-    return response.json();
+    console.log('Get user models API call - not implemented yet');
+    return [];
   }
 
   async activateModel(modelId, userId) {
-    const response = await fetch(`${API_BASE_URL}/models/${modelId}/activate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId }),
-    });
-    return response.json();
+    console.log('Activate model API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
   async deleteModel(modelId, userId) {
-    const response = await fetch(`${API_BASE_URL}/models/${modelId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_id: userId }),
-    });
-    return response.json();
+    console.log('Delete model API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 
-  // Settings
   async getUserSettings(userId) {
-    const response = await fetch(`${API_BASE_URL}/settings/${userId}`);
-    return response.json();
+    console.log('Get user settings API call - not implemented yet');
+    return {
+      voice_alerts: true,
+      sound_type: 'voice',
+      alert_threshold: 10,
+      volume: 80,
+      notifications: true
+    };
   }
 
   async updateUserSettings(userId, settings) {
-    const response = await fetch(`${API_BASE_URL}/settings/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(settings),
-    });
-    return response.json();
+    console.log('Update user settings API call - not implemented yet');
+    return { error: 'Backend not implemented yet' };
   }
 }
 
